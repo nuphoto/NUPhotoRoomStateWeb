@@ -1,8 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 
-const supabase = await createClient()
-
 export const getEnterUsers = async () => {
+    const supabase = await createClient()
+
     const users = await supabase
         .from("user")
         .select("name")
