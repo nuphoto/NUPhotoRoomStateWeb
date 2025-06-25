@@ -74,7 +74,7 @@ const EnterExitButton = ({ initialIsEnter }: Props) => {
             // ボタンのスタイルを状態によって変更することも可能
             // variant={currentIsEnter ? "destructive" : "default"} // 例: 退室は赤、入室はデフォルト
             >
-            {isUpdating ? (currentIsEnter ? '退室処理中...' : '入室処理中...') : (currentIsEnter ? '退室' : '入室')}
+            {isUpdating ? (currentIsEnter ? '入室処理中...' : '退室処理中...') : (currentIsEnter ? '退室' : '入室')}
         </Button>
     )
 }
