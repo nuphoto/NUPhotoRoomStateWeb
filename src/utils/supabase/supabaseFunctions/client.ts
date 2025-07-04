@@ -60,3 +60,9 @@ export const updateEntryStatus = async (newStatus: boolean) => {
         return { success: false, message: `予期せぬエラーが発生しました: ${errorMessage}` };
     }
 };
+
+export const removeMember = async (id: string) => {
+    const supabase = createClient();
+
+    await supabase.from("room").delete().eq("id", id);
+}

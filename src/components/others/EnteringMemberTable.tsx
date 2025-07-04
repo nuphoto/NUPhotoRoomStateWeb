@@ -7,22 +7,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-type Member = {
-    name: string;
-};
+import { Button } from '../ui/button';
+import type { RoomMember } from '@/utils/types';
+import { removeMember } from "@/utils/supabase/supabaseFunctions/client"
 
 type Props = {
-    members: Member[] | null;
+    members: RoomMember[] | null;
 };
 
 const EnteringMemberTable = ({ members }: Props) => {
     if (!members || members.length == 0) {
-        members = [{name: "誰もいません"}]
+        members = []
     }
 
+    const removeMembers = async (id: string) => {
+        await removeMember(id);
+    };
+
     return (
-        <div className="max-w-xs w-full rounded-md border shadow-sm">
+        <div className="max-w-xs w-3xs rounded-md border shadow-sm">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -30,9 +33,19 @@ const EnteringMemberTable = ({ members }: Props) => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {members.map((member, i) => (
-                        <TableRow key={i}>
-                            <TableCell className="text-center">{member.name}</TableCell>
+                    {members.map((member) => (
+                        <TableRow key={member.id}>
+                            <TableCell className="text-center">
+                                <div className="flex items-center justify-between">
+                                    <span>{member.name}</span>
+                                    <Button
+                                        onClick={() => removeMembers(member.id)}
+                                        className="ml-2 bg-white hover:bg-gray-200 text-red-500 hover:text-red-700 focus:outline-none"
+                                    >
+                                        ×
+                                    </Button>
+                                </div>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

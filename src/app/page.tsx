@@ -1,19 +1,51 @@
+"use client"
+
+import useRoomStore from "@/store/roomStore";
+import { useEffect } from "react";
 import EnteringMemberTable from "@/components/others/EnteringMemberTable";
-import EnterExitButton from "@/components/others/EnterExitButton";
-import { getEnterUsers, getEntryStatus } from "@/utils/supabase/supabaseFunctions/server";
+import { createClient } from '@/utils/supabase/client'
 
+export default function Home() {
+  const supabase = createClient();
+  const members = useRoomStore(state => state.members);
+  const isLoading = useRoomStore(state => state.isLoading);
 
-export default async function Home() {
-  const users = await getEnterUsers()
-  const isEnter = await getEntryStatus()
+  useEffect(() => {
+    const setIsLoading = useRoomStore.getState().setIsLoading;
+    const fetchMembers = useRoomStore.getState().fetchMembers;
+
+    fetchMembers();
+    setIsLoading(false);
+
+    //リアルタイム購読のセットアップ
+    const subscription = supabase
+      .channel("room-member-changes")
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'room',
+        }, 
+        (payload) => {
+          console.log('リアルタイム更新:', payload);
+          fetchMembers();
+        }
+      )
+      .subscribe();
+    // クリーンアップ関数
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+
+  })
+
+  if (isLoading) {
+    return <div>読み込み中...</div>;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      {/* <p className="text-center text-xl text-green-500">
-        {`現在部室に${users?.length ?? 0}人います`}
-      </p> */}
-      <EnteringMemberTable members={users}/>
-      <EnterExitButton initialIsEnter={isEnter}/>
+      <EnteringMemberTable members={members}/>
       
     </div>
   );
