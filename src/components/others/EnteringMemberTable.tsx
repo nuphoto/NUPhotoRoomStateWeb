@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Table,
   TableBody,
@@ -16,12 +16,16 @@ type Props = {
 };
 
 const EnteringMemberTable = ({ members }: Props) => {
+    const [isLoading, setIsLoading] = useState(false);
+
     if (!members || members.length == 0) {
         members = []
     }
 
     const removeMembers = async (id: string) => {
+        setIsLoading(true);
         await removeMember(id);
+        setIsLoading(false);
     };
 
     return (
@@ -40,6 +44,7 @@ const EnteringMemberTable = ({ members }: Props) => {
                                     <span>{member.name}</span>
                                     <Button
                                         onClick={() => removeMembers(member.id)}
+                                        disabled={isLoading}
                                         className="ml-2 bg-white hover:bg-gray-200 text-red-500 hover:text-red-700 focus:outline-none"
                                     >
                                         ×
